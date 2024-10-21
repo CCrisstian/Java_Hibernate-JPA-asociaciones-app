@@ -3,6 +3,7 @@
     <persistence-unit name="ejemploJPA" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>org.CCristian.hibernateapp.entity.Cliente</class>
+        <class>org.CCristian.hibernateapp.entity.Factura</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property
