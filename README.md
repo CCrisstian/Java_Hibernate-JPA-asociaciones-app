@@ -24,6 +24,7 @@ public class Cliente {
   private Auditoria audit = new Auditoria();
 }
 ```
+
 ```java
 @Entity
 @Table(name = "facturas")
@@ -86,6 +87,7 @@ public class Cliente {
     private List<Direccion> direccions;
 }
 ```
+
 ```java
 @Entity
 @Table(name = "direcciones")
@@ -136,6 +138,7 @@ public class Cliente {
     private List<Factura> facturas;
 }
 ```
+
 ```java
 @Entity
 @Table(name = "facturas")
@@ -156,6 +159,7 @@ public class Factura {
     }
 }
 ```
+
 
 - `@OneToOne`
   - Representa una relación en la que <b>un registro de una entidad está relacionado con un solo registro de otra entidad</b>.
@@ -196,6 +200,7 @@ public class Cliente {
     @JoinColumn(name = "cliente_detalle_id")
     private ClienteDetalle detalle;
 ```
+
 ```java
 @Entity
 @Table(name = "clientes_detalles")
@@ -211,6 +216,70 @@ public class ClienteDetalle {
     private Long puntosAcumulados;
 }
 ```
+
+
+- `@OneToOne` Bidireccional
+  - La anotación `@OneToOne` establece que hay una relación uno a uno con la entidad `ClienteDetalle`.
+  - El atributo `mappedBy = "cliente"` indica que la relación es bidireccional y que la entidad `ClienteDetalle` es la propietaria de la relación, es decir, la que tiene la clave foránea (`cliente` en `ClienteDetalle`).
+  - `cascade = CascadeType.ALL` permite que todas las operaciones de persistencia (como guardar, actualizar o eliminar) se propaguen automáticamente de `Cliente` a `ClienteDetalle`.
+  - `orphanRemoval = true` asegura que si se elimina la referencia al `ClienteDetalle` desde un `Cliente`, Hibernate también eliminará el registro correspondiente en la base de datos.
+```java
+@Entity
+@Table(name = "clientes")
+public class Cliente {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) /*Id Auto_Incremental*/
+    private long id;
+
+    private String nombre;
+    private String apellido;
+
+    @Column(name = "forma_pago")
+    private String formaPago;
+
+    @Embedded
+    private Auditoria audit = new Auditoria();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "id_cliente")
+    @JoinTable(name = "tbl_clientes_direcciones"
+    , joinColumns = @JoinColumn(name = "id_cliente")
+    , inverseJoinColumns = @JoinColumn(name = "id_direccion")
+    , uniqueConstraints = @UniqueConstraint(columnNames = {"id_direccion"}))
+    private List<Direccion> direccions;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "cliente")
+    private List<Factura> facturas;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "cliente")
+    private ClienteDetalle detalle;
+}
+```
+
+  - La anotación `@OneToOne` también se usa en `ClienteDetalle` para indicar la relación con `Cliente`.
+  - `@JoinColumn(name = "cliente_detalle_id")` especifica que la columna `cliente_detalle_id` en la tabla `clientes_detalles` será la clave foránea que referenciará la columna `id` de la tabla `clientes`.
+  - Esto convierte a la entidad `ClienteDetalle` en el lado propietario de la relación, ya que es la que contiene la clave foránea.
+```java
+@Entity
+@Table(name = "clientes_detalles")
+public class ClienteDetalle {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private boolean prime;
+
+    @Column(name = "puntos_acumulados")
+    private Long puntosAcumulados;
+
+    @OneToOne
+    @JoinColumn(name = "cliente_detalle_id")
+    private Cliente cliente;
+}
+```
+
 
 - `@ManyToMany`
   - Representa una relación en la que <b>muchos registros de una entidad están relacionados con muchos registros de otra entidad</b>.
