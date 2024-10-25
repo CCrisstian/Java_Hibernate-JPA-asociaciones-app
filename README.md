@@ -160,9 +160,49 @@ public class Factura {
 - `@OneToOne`
   - Representa una relación en la que <b>un registro de una entidad está relacionado con un solo registro de otra entidad</b>.
   - En la base de datos, esto puede implementarse con una clave foránea o una columna única.
-    ```java
-    
-    ```
+  - La relación con `Cliente` se configura usando `@OneToOne`, lo que indica que cada `ClienteDetalle` está asociado con un solo `Cliente` y viceversa.
+  - Por defecto, Hibernate asumirá que hay una columna en la tabla `clientes_detalles` que actúa como clave foránea hacia la tabla `clientes`, para asociar un registro de `ClienteDetalle` con su correspondiente `Cliente`.
+```java
+@Entity
+@Table(name = "clientes")
+public class Cliente {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) /*Id Auto_Incremental*/
+    private long id;
+
+    private String nombre;
+    private String apellido;
+
+    @Column(name = "forma_pago")
+    private String formaPago;
+
+    @Embedded
+    private Auditoria audit = new Auditoria();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "cliente")
+    private List<Factura> facturas;
+}
+```
+```java
+@Entity
+@Table(name = "clientes_detalles")
+public class ClienteDetalle {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private boolean prime;
+
+    @Column(name = "puntos_acumulados")
+    private Long puntosAcumulados;
+
+    @OneToOne
+    private Cliente cliente;
+}
+```
+
 - `@ManyToMany`
   - Representa una relación en la que <b>muchos registros de una entidad están relacionados con muchos registros de otra entidad</b>.
   - En la base de datos, esto se implementa mediante una <b>tabla intermedia</b> que contiene las claves foráneas de ambas entidades.
