@@ -4,6 +4,8 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>org.CCristian.hibernateapp.entity.Cliente</class>
         <class>org.CCristian.hibernateapp.entity.Factura</class>
+        <class>org.CCristian.hibernateapp.entity.Direccion</class>
+        <class>org.CCristian.hibernateapp.entity.ClienteDetalle</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property
