@@ -160,11 +160,10 @@ public class Factura {
 - `@OneToOne`
   - Representa una relación en la que <b>un registro de una entidad está relacionado con un solo registro de otra entidad</b>.
   - En la base de datos, esto puede implementarse con una clave foránea o una columna única.
-  - La relación con `Cliente` se configura usando `@OneToOne`, lo que indica que cada `ClienteDetalle` está asociado con un solo `Cliente` y viceversa.
-  - Por defecto, Hibernate asumirá que hay una columna en la tabla `clientes_detalles` que actúa como clave foránea hacia la tabla `clientes`, para asociar un registro de `ClienteDetalle` con su correspondiente `Cliente`.
+  - La anotación `@OneToOne` establece una relación uno a uno entre `Cliente` y `ClienteDetalle`.
+  - Esta configuración implica que cada `Cliente` puede tener un único `ClienteDetalle`, y viceversa.
+  - En este caso, la relación no tiene especificada una columna de unión explícita, lo que significa que Hibernate creará una columna predeterminada para asociar el `Cliente` con su `ClienteDetalle`.
 ```java
-@Entity
-@Table(name = "clientes")
 public class Cliente {
 
     @Id
@@ -180,9 +179,19 @@ public class Cliente {
     @Embedded
     private Auditoria audit = new Auditoria();
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "id_cliente")
+    @JoinTable(name = "tbl_clientes_direcciones"
+    , joinColumns = @JoinColumn(name = "id_cliente")
+    , inverseJoinColumns = @JoinColumn(name = "id_direccion")
+    , uniqueConstraints = @UniqueConstraint(columnNames = {"id_direccion"}))
+    private List<Direccion> direccions;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "cliente")
     private List<Factura> facturas;
-}
+
+    @OneToOne
+    private ClienteDetalle detalle;
 ```
 ```java
 @Entity
@@ -197,9 +206,6 @@ public class ClienteDetalle {
 
     @Column(name = "puntos_acumulados")
     private Long puntosAcumulados;
-
-    @OneToOne
-    private Cliente cliente;
 }
 ```
 
