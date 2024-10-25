@@ -163,6 +163,8 @@ public class Factura {
   - La anotación `@OneToOne` establece una relación uno a uno entre `Cliente` y `ClienteDetalle`.
   - Esta configuración implica que cada `Cliente` puede tener un único `ClienteDetalle`, y viceversa.
   - En este caso, la relación no tiene especificada una columna de unión explícita, lo que significa que Hibernate creará una columna predeterminada para asociar el `Cliente` con su `ClienteDetalle`.
+  - `@JoinColumn(name = "cliente_detalle_id")` especifica que la columna `cliente_detalle_id` en la tabla `clientes` se usará como clave foránea para referenciar la tabla `clientes_detalles`.
+  - Esta columna se agregará a la tabla `clientes` para almacenar el identificador del detalle asociado.
 ```java
 public class Cliente {
 
@@ -191,6 +193,7 @@ public class Cliente {
     private List<Factura> facturas;
 
     @OneToOne
+    @JoinColumn(name = "cliente_detalle_id")
     private ClienteDetalle detalle;
 ```
 ```java
