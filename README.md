@@ -311,7 +311,6 @@ public class Alumno {
     private List<Curso> cursos;
 }
 ```
-
   - La entidad `Curso` representa los cursos que se imparten, con atributos como `titulo` y `profesor`. No es necesario agregar explícitamente la anotación `@ManyToMany` en esta clase para que la relación sea bidireccional, pero puede hacerse si se quiere acceder a la lista de alumnos desde `Curso`.
 
 ```java
@@ -325,5 +324,52 @@ public class Curso {
 
     private String titulo;
     private String profesor;
+}
+```
+
+- `@ManyToMany` Bidireccional
+  - Para implementar una relación bidireccional `@ManyToMany` en JPA/Hibernate, ambas entidades (`Alumno` y `Curso`) deben estar configuradas para que se pueda navegar la relación en ambas direcciones. La relación se maneja a través de una tabla intermedia, y en este caso, los alumnos pueden estar inscritos en varios cursos, y un curso puede tener varios alumnos.
+  - Clase `Alumno`:
+    - Tiene una relación `@ManyToMany` con la entidad `Curso`, gestionada mediante una tabla intermedia llamada `tbl_alumnos_cursos`.
+    - La anotación `@JoinTable` define el nombre de la tabla intermedia y especifica cómo se relacionan las columnas con las tablas `alumnos` y `cursos`.
+  - Clase `Curso`:
+    - Tiene una relación `@ManyToMany` con la entidad `Alumno`, pero no especifica una tabla intermedia. En su lugar, usa el atributo `mappedBy` para indicar que la propiedad `cursos` en la clase `Alumno` es la responsable de gestionar la relación.
+    - El atributo `mappedBy` le indica a Hibernate que no cree una nueva tabla para la relación, ya que la configuración de la tabla intermedia ya está definida en la clase `Alumno`.
+
+```java
+@Entity
+@Table(name = "alumnos")
+public class Alumno {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nombre;
+    private String apellido;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "tbl_alumnos_cursos",
+            joinColumns = @JoinColumn(name = "alumno_id"),
+            inverseJoinColumns = @JoinColumn(name = "curso_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"alumno_id", "curso_id"}))
+    private List<Curso> cursos;
+}
+```
+
+```java
+@Entity
+@Table(name = "cursos")
+public class Curso {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String titulo;
+    private String profesor;
+
+    @ManyToMany(mappedBy = "cursos")
+    private List<Alumno> alumnos;
 }
 ```
