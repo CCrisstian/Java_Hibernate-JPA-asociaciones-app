@@ -6,6 +6,8 @@
         <class>org.CCristian.hibernateapp.entity.Factura</class>
         <class>org.CCristian.hibernateapp.entity.Direccion</class>
         <class>org.CCristian.hibernateapp.entity.ClienteDetalle</class>
+        <class>org.CCristian.hibernateapp.entity.Alumno</class>
+        <class>org.CCristian.hibernateapp.entity.Curso</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property
